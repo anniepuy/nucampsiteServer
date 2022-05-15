@@ -8,9 +8,9 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
 //routes
-const campsiteRouter = require('/routes/campsiteRouter');
-const promotionRouter = require('/routes/promotionRouter');
-const partnerRouter = require('/routes/partnerRouter');
+const campsiteRouter = require('./routes/campsiteRouter');
+const promotionRouter = require('./routes/promotionRouter');
+const partnerRouter = require('./routes/partnerRouter');
 
 var app = express();
 
