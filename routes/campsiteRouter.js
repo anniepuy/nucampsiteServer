@@ -36,7 +36,13 @@ remove all methods and replace with explicit endpoint headers and codes
     res.end('PUT operation not supported on /campsites');
 })
 .delete((req, res, next) => {
-    res.end('Deleting all campsites');
+    Campsite.deleteMany()
+    .then(response => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json(response);
+    })
+    .catch(err => next(err));
 });
 
 //SAT WORKSHOP
