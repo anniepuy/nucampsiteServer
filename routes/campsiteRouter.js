@@ -99,12 +99,22 @@ campsiteRouter.route('/:campsiteId/comments')
     .catch(err => next(err));
 })
 .post((req, res, next) => {
-    Campsite.create(req.body)
+    Campsite.findById(req.params.campsiteId)
     .then(campsite => {
-        console.log('Campsite Created ', campsite);
-        res.statusCode = 200;
-        res.setHeader('Content-Type', 'application/json');
-        res.json(campsite);
+        if (campsite) {
+            campsite.comments.push(req.body);
+            campsite.save()
+            .then(campsite => {
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json(campsite);
+            })
+            .catch(err => next(err));
+        } else {
+            err = new Error(`Campsite ${req.params.campsiteId} not found`);
+            err.status = 404;
+            return next(err);
+        } 
     })
     .catch(err => next(err));
 })
