@@ -47,8 +47,14 @@ remove all methods and replace with explicit endpoint headers and codes
 
 //SAT WORKSHOP
 campsiteRouter.route('/:campsiteId')
-.get((req, res) => {
-    res.end(`Will send details of the campsite: ${req.params.campsiteId} to you.`);
+.get((req, res, next) => {
+    Campsite.findById(req.params.campsiteId)
+    .then(campsite => {
+        req.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json(campsite);
+    })
+    .catch(err => next(err));
 })
 .post((req, res) => {
     res.statusCode = 403;
