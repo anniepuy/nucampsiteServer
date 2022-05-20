@@ -1,4 +1,5 @@
 const express = require('express');
+const res = require('express/lib/response');
 const Campsite = require('../models/campsite');
 const campsiteRouter = express.Router();
 
@@ -60,13 +61,25 @@ campsiteRouter.route('/:campsiteId')
     res.statusCode = 403;
     res.end(`POST operation not supported on /campsites/${req.params.campsiteId}`);
 })
-.put((req, res) => {
-    res.write(`Updating the campsite: ${req.params.campsiteId}\n`);
-    res.end(`Will update the campsite: ${req.body.name}
-        with description: ${req.body.description}`);
+.put((req, res, next) => {
+    Campsite.findByIdAndUpdate(req.params.campsiteId, {
+        $set: req.body
+    }, { new: true })
+    .then(campsite => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json(campsite);
+    })
+   .catch(err => next(err));
 })
 .delete((req, res) => {
-    res.end(`Deleting campsite: ${req.params.campsiteId}`);
+    Campsite.findByIdAndDelete(req.params.campsiteId)
+    .then(response => {
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json(response);
+    })
+    .catch(err => next(err));
 });
 
 
