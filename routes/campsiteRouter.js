@@ -84,14 +84,14 @@ campsiteRouter.route('/:campsiteId')
 
 campsiteRouter.route('/:campsiteId/comments')
 .get((req, res, next) => {
-    Campsite.findById(req.params.campsiteIds)
+    Campsite.findById(req.params.campsiteId)
     .then(campsite => {
         if (campsite) {
             res.statusCode = 200;
             res.setHeader('Content-Type', 'application/json');
             res.json(campsite.comments);
         } else {
-            err = new Error(`Campiste ${req.params.campsiteId} not found`);
+            err = new Error(`Campsite ${req.params.campsiteId} not found`);
             err.status = 404;
             return next(err);
         }
@@ -153,7 +153,7 @@ campsiteRouter.route('/:campsiteId/comments/:commentId')
             res.statusCode = 200;
             res.setHeader('Content-Type', 'application/json');
             res.json(campsite.comments.id(req.params.commentId));
-        } else if (!campiste) {
+        } else if (!campsite) {
             err = new Error(`Campsite ${req.params.campsiteId} not found`);
             err.status = 404;
             return next(err);
@@ -169,7 +169,7 @@ campsiteRouter.route('/:campsiteId/comments/:commentId')
     res.statusCode = 403;
     res.end(`POST operation not supported on /campsites/${req.params.campsiteId}/comments/${req.params.commentId}`);
 })
-.put((req, res, next)=> {
+.put((req, res, next) => {
     Campsite.findById(req.params.campsiteId)
     .then(campsite => {
         if (campsite && campsite.comments.id(req.params.commentId)) {
