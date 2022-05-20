@@ -21,15 +21,21 @@ remove all methods and replace with explicit endpoint headers and codes
     })
     .catch(err => next(err));
 })
-
-.post((req, res) => {
-    res.end(`Will add the campsites: ${req.body.name} with description: ${req.body.description}`);
+.post((req, res, next) => {
+    Campsite.create(req.body)
+    .then(campsite => {
+        console.log('Campsite Created ', campsite);
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json(campsite);
+    })
+    .catch(err => next(err));
 })
 .put((req, res) => {
     res.statusCode = 403;
     res.end('PUT operation not supported on /campsites');
 })
-.delete((req, res) => {
+.delete((req, res, next) => {
     res.end('Deleting all campsites');
 });
 
