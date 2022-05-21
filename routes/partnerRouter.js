@@ -1,4 +1,3 @@
-
 const express = require('express');
 const res = require('express/lib/response');
 const Partner = require('../models/partner');
