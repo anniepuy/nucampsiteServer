@@ -46,7 +46,6 @@ remove all methods and replace with explicit endpoint headers and codes
     .catch(err => next(err));
 });
 
-//SAT WORKSHOP
 campsiteRouter.route('/:campsiteId')
 .get((req, res, next) => {
     Campsite.findById(req.params.campsiteId)
