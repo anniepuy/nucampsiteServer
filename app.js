@@ -36,7 +36,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-/* Authentication
+// Authentication
 function auth(req, res, next) {
   console.log(req.header)
   const authHeader = req.headers.authorization;
@@ -61,8 +61,6 @@ function auth(req, res, next) {
 }
 
 app.use(auth)
-
-*/
 
 app.use(express.static(path.join(__dirname, 'public')));
 
