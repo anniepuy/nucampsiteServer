@@ -4,6 +4,9 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
+const session = require('express-session');
+const FileStore = require('session-file-store')(session);
+
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
@@ -35,10 +38,20 @@ app.set('view engine', 'jade');
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser('12345-67890-09876-54321'));
+//app.use(cookieParser('12345-67890-09876-54321'));
+
+//week 3 auth part 2: sessions
+app.use(session({
+  name: 'session-id',
+  secret: '12345-67890-09876-54321',
+  resave: false,
+  store: new FileStore()
+}));
 
 // Authentication
 function auth(req, res, next) {
+  console.log(req.session);
+
   if (!req.signedCookies.user) {
     const authHeader = req.headers.authorization;
     if (!authHeader) {
@@ -52,7 +65,11 @@ function auth(req, res, next) {
     const user = auth[0];
     const pass = auth[1];
     if(user === 'admin' && pass === 'password') {
+      req.session.user = 'admin';
+      /*
+      Old cookies
       res.cookie('user', 'admin', {signed: true});
+      */
       return next(); // authorized
     } else {
       const err = new Error('You are not authenicated!');
@@ -61,7 +78,11 @@ function auth(req, res, next) {
       return next(err);
     }
   } else {
+    /*
+    old cookies
     if (req.signedCookies.user === 'admin') {
+    */
+    if (req.session.user === 'admin') {
       return next();
     } else {
       const err = new Error('You are not authorized!');
