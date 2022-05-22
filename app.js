@@ -9,7 +9,7 @@ const FileStore = require('session-file-store')(session);
 
 //authenication
 const passport = require('passport');
-const authenticate = require('./authenicate');
+const authenticate = require('./authenticate');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
