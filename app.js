@@ -1,15 +1,15 @@
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
-var cookieParser = require('cookie-parser');
+//var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
-const session = require('express-session');
-const FileStore = require('session-file-store')(session);
+//const session = require('express-session');
+//const FileStore = require('session-file-store')(session);
 
 //authenication
 const passport = require('passport');
-const authenticate = require('./authenticate');
+const config = require('./config');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -21,7 +21,8 @@ const partnerRouter = require('./routes/partnerRouter');
 
 const mongoose = require('mongoose');
 const req = require('express/lib/request');
-const url = 'mongodb://localhost:27017/nucampsite';
+
+const url = config.mongoUrl;
 const connect = mongoose.connect(url, {
   useCreateIndex: true,
   useFindAndModify: false,
@@ -44,7 +45,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 //app.use(cookieParser('12345-67890-09876-54321'));
 
-//week 3 auth part 2: sessions
+/*week 3 auth part 2: sessions, removed with tokens
 app.use(session({
   name: 'session-id',
   secret: '12345-67890-09876-54321',
@@ -52,10 +53,11 @@ app.use(session({
   resave: false,
   store: new FileStore()
 }));
+app.use(passport.session());
+*/
 
 //adding passport js methods using sessions
 app.use(passport.initialize());
-app.use(passport.session());
 
 
 //moved routes before auth to allow users to register
@@ -63,7 +65,8 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
 
-// Authentication
+/*
+ Authentication removed with Tokens
 function auth(req, res, next) {
   console.log(req.user);
 
@@ -76,7 +79,9 @@ function auth(req, res, next) {
   }
 }
 
+remove wk 3, token auth
 app.use(auth)
+*/
 
 app.use(express.static(path.join(__dirname, 'public')));
 
