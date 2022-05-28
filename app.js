@@ -9,6 +9,8 @@ var logger = require('morgan');
 
 //authenication
 const passport = require('passport');
+//const config = require('./authenitcate');
+
 const config = require('./config');
 
 var indexRouter = require('./routes/index');
@@ -43,18 +45,6 @@ app.set('view engine', 'jade');
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-//app.use(cookieParser('12345-67890-09876-54321'));
-
-/*week 3 auth part 2: sessions, removed with tokens
-app.use(session({
-  name: 'session-id',
-  secret: '12345-67890-09876-54321',
-  saveUninitialized: false,
-  resave: false,
-  store: new FileStore()
-}));
-app.use(passport.session());
-*/
 
 //adding passport js methods using sessions
 app.use(passport.initialize());
