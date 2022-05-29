@@ -181,8 +181,8 @@ campsiteRouter.route('/:campsiteId/comments/:commentId')
 .put(authenticate.verifyUser, (req, res, next) => {
     Campsite.findById(req.params.campsiteId)
     .then(campsite => {
-        if (req.user._id.equals(req.comment.auther._id)){
-        //if(true){
+        //if (req.user._id.equals(req.comment.author._id)){
+        if(req.user._id.equals(req.body.author)){
             if (campsite && campsite.comments.id(req.params.commentId)) {
                 if (req.body.rating) {
                     campsite.comments.id(req.params.commentId).rating = req.body.rating;
@@ -206,7 +206,11 @@ campsiteRouter.route('/:campsiteId/comments/:commentId')
                 err.status = 404;
                 return next(err);
             }
-        }
+       } else {
+           err = new Error(`Put not allowed. ${req.params}`);
+           err.status = 404;
+           return next(err);
+       }
     })
     .catch(err => next(err));
 })
