@@ -1,15 +1,11 @@
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
-//var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
-//const session = require('express-session');
-//const FileStore = require('session-file-store')(session);
 
 //authenication
 const passport = require('passport');
-//const config = require('./authenitcate');
 
 const config = require('./config');
 
@@ -38,6 +34,16 @@ connect.then(()=> console.log('Connected correctly to server'),
 
 var app = express();
 
+//routing method to catch all requests to server
+app.all('*', (req, res, next)=> {
+  if (req.secure) {
+    return next();
+  } else {
+    console.log(`Redirecting to: https://${req.hostname}:${app.get('secPort')}${req.url}`);
+    res.redirect(301, `https://${req.hostname}:${app.get('secPort')}${req.url}`);
+  }
+});
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
@@ -53,25 +59,6 @@ app.use(passport.initialize());
 //moved routes before auth to allow users to register
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-
-
-/*
- Authentication removed with Tokens
-function auth(req, res, next) {
-  console.log(req.user);
-
-  if (!req.user) {
-      const err = new Error('You are not authenicated!');
-      res.statusCode = 401;
-      return next(err);
-  } else {
-      return next(err);
-  }
-}
-
-remove wk 3, token auth
-app.use(auth)
-*/
 
 app.use(express.static(path.join(__dirname, 'public')));
 
