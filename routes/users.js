@@ -5,10 +5,11 @@ const passport = require('passport');
 const authenticate = require('../authenticate');
 const res = require('express/lib/response');
 const user = require('../models/user');
+const cors = require('/cors');
 
 
 /* GET users listing. */
-router.get('/', authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
+router.get('/', cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
   user.find().then(users => {
     res.statusCode = 200;
     res.setHeader('Content-Type', 'application/json')
@@ -19,7 +20,7 @@ router.get('/', authenticate.verifyUser, authenticate.verifyAdmin, (req, res, ne
 
 
 //updating router to use passportjs w/ authentication
-router.post('/signup', (req, res)=> {
+router.post('/signup', cors.corsWithOptions, (req, res)=> {
   User.register(
     new User({username: req.body.username}),
     req.body.password,
@@ -53,58 +54,14 @@ router.post('/signup', (req, res)=> {
   );
 });
 
-router.post('/login', passport.authenticate('local'), (req, res)=> {
+router.post('/login',cors.corsWithOptions,  passport.authenticate('local'), (req, res)=> {
   const token = authenticate.getToken({_id: req.user._id});
   res.statusCode = 200;
   res.setHeader('Content-Type', 'application/json');
   res.json({success: true, token: token, status: 'You are successfully logged in!'});
 });
 
-
-/*
-old login
-router.post('/login', (req, res, next)=> {
-  if(!req.session.user) {
-    const authHeader = req.headers.authorization;
-
-    if(!authHeader) {
-      const err = new Error('You are not authenticated!');
-      res.setHeader('WWW-Authenticate', 'Basic');
-      err.status = 401;
-      return next(err);
-    }
-
-    const auth = Buffer.from(authHeader.split(' ')[1], 'base64').toString().split(':');
-    const username = auth[0];
-    const password = auth[1];
-
-    User.findOne({username: username})
-    .then(user=> {
-      if (!user) {
-        const err = new Error(`User ${username} does not exist!`);
-        err.status = 401;
-        return next(err);
-      } else if (user.password !== password) {
-        const err = new Error('Your password is incorrect!');
-        err.status = 401;
-        return next(err);
-      } else if (user.username === username && user.password === password) {
-        req.session.user = 'authenticated';
-        res.statusCode = 200;
-        res.setHeader('Content-Type', 'text/plain');
-        res.end('You are authenticated!')
-      }
-    })
-    .catch(err => next(err));
-  } else {
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'text/plain');
-    res.end('You are already authenticated!');
-  }
-});
-*/
-
-router.get('/logout', (req, res, next)=> {
+router.get('/logout', cors.corsWithOptions, (req, res, next)=> {
   if(req.session) {
     req.session.destroy();
     res.clearCookie('session-id');
