@@ -5,7 +5,7 @@ const passport = require('passport');
 const authenticate = require('../authenticate');
 const res = require('express/lib/response');
 const user = require('../models/user');
-const cors = require('/cors');
+const cors = require('./cors');
 
 
 /* GET users listing. */
