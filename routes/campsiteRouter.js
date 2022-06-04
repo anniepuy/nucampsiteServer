@@ -172,6 +172,7 @@ campsiteRouter.route('/:campsiteId/comments/:commentId')
 })
 .put(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
     Campsite.findById(req.params.campsiteId)
+    .populate('comments.author')
     .then(campsite => {
         //if (req.user._id.equals(req.comment.author._id)){
         if(req.user._id.equals(req.body.author)){
@@ -208,6 +209,7 @@ campsiteRouter.route('/:campsiteId/comments/:commentId')
 })
 .delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
     Campsite.findById(req.params.campsiteId)
+    .populate('comments.author')
     .then(campsite => {
         if (campsite) {
             req.body.author = req.user._id
