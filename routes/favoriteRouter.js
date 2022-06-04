@@ -87,14 +87,11 @@ favoriteRouter.route('/:campsiteId')
 })
 .post(cors.corsWithOptions, authenticate.verifyUser, (req, res) => {
     //need to add in if/else to see if it is already posted as a favorite
-    //use find, but should we $set: req.body in the find?
-    //Favorite.findOne(req.params.favoriteId === 'false')
-    //Favorite.findOne({favoriteId: { $neq: 'true' }})
     Favorite.findOne({user: req.user._id})
     .then(favorites => {
         if (favorites.includes(req.params.campsiteId)) {
             res.statusCode = 403;
-            res.end(`Favorites has been added /${req.params.campsiteId}`);
+            res.end(`Favorites already exists /${req.params.campsiteId}`);
         } else {
             Favorite.create(req.body.campsiteId)
             .then(favorites => {
@@ -113,12 +110,23 @@ favoriteRouter.route('/:campsiteId')
 })
 .delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
     Favorite.findOne(req.user._id)
-    .then (favorite => {
-        const indexOfFav = favorite.campsite.findIndex(favorite => {
-            return favorite.id === req.params.campsiteId;
-        })
-        const favHold = favorite.campsiteId.filter(req.params.campsiteId);
-        favorite.campsite.splice(favHold, 1)
+    .then(favorite => {
+        const indexOfFav = favorite.campsite.indexOf(req.params.campsiteId)
+        if(indexOfFav > 0) {
+            favorite.campsite.splice(favHold, 1);
+            favorite.save()
+            .then(favorite => {
+                console.log('Favorite Deleted', favorite);
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json(response);
+            })
+            .catch(err => next(err));
+        } else {
+            res.statusCode = 200;
+            res.setHeader('Content-Type', 'text/plain');
+            res.end('You do not have any favorites to delete');
+        }
     })
     .then(response => {
         res.statusCode = 200;
