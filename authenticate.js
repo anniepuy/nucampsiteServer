@@ -55,7 +55,7 @@ exports.verifyAdmin =(req, res, next) => {
 exports.facebookPassport = passport.use(
     new FacebookTokenStrategy(
         {
-            clientID: config.facebook.clientId,
+            clientID: config.facebook.clientID,
             clientSecret: config.facebook.clientSecret
         }, 
         (accessToken, refreshToken, profile, done) => {

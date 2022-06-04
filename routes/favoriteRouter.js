@@ -22,16 +22,38 @@ favoriteRouter.route('/')
 .post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
     Favorite.findOne({user: req.user._id })
     .then(favorite => {
-        if (favorite.includes(req.params.campsiteId)) {
-            //or is it favorite.include(req.params.favorite._id)
-            return ('This campsite is already a favorite')
-        } else {
-            Favorite.create(req.body.campsiteId)
+        if (favorite) {
+            req.body.forEach(item => {
+                if (!favorite.campsites.includes(item._id)) {
+                    favorite.campsites.push(item._id)
+                }
+            })
+            favorite.save()
             .then(favorite => {
                 console.log('Favorite Created ', favorite);
                 res.statusCode = 200;
                 res.setHeader('Content-Type', 'application/json');
                 res.json(favorite);
+            })
+            .catch(err => next(err))
+        } else {
+            Favorite.create({user: req.user._id})
+            .then(favorite => {
+                if (favorite) {
+                    req.body.forEach(item => {
+                        if (!favorite.campsites.includes(item._id)) {
+                            favorite.campsites.push(item._id)
+                        }
+                    })
+                    favorite.save()
+                    .then(favorite => {
+                        console.log('Favorite Created ', favorite);
+                        res.statusCode = 200;
+                        res.setHeader('Content-Type', 'application/json');
+                        res.json(favorite);
+                    })
+                    .catch(err => next(err))
+                }
             })
         }
     })
@@ -43,11 +65,11 @@ favoriteRouter.route('/')
 })
 .delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
     Favorite.findOneAndDelete({user: req.user._id})
-    .then(response => {
+    .then(favorite => {
         if (favorite) {
             res.statusCode = 200;
             res.setHeader('Content-Type', 'application/json');
-            res.json(response);
+            res.json(favorite);
         } else {
             res.statusCode = 200;
             res.setHeader('Content-Type', 'text/plain');
@@ -65,9 +87,10 @@ favoriteRouter.route('/:campsiteId')
 })
 .post(cors.corsWithOptions, authenticate.verifyUser, (req, res) => {
     //need to add in if/else to see if it is already posted as a favorite
-    Favorite.findOne(req.params.favoriteId, {
-        $set: req.body
-    }, {new: true})
+    //use find, but should we $set: req.body in the find?
+    //Favorite.findOne(req.params.favoriteId === 'false')
+    //Favorite.findOne({favoriteId: { $neq: 'true' }})
+    Favorite.findOne({user: req.user._id})
     .then(favorites => {
         if (favorites.includes(req.params.campsiteId)) {
             res.statusCode = 403;
@@ -88,11 +111,8 @@ favoriteRouter.route('/:campsiteId')
     res.statusCode = 403;
     res.end('PUT operation not supported on /favortes');
 })
-/*
-help
-*/
 .delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
-    Favorite.findOne(req.params.campsiteId)
+    Favorite.findOne(req.user._id)
     .then (favorite => {
         const indexOfFav = favorite.campsite.findIndex(favorite => {
             return favorite.id === req.params.campsiteId;
